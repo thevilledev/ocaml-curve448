@@ -29,8 +29,6 @@
  (tags
   (cryptography x448 ed448 curve448 rfc7748 rfc8032 "elliptic curves"))
  (depends
-  (dune
-   (>= 3.6.2))
   (ocaml
    (>= 4.14.0))
   (mirage-crypto-rng

@@ -19,7 +19,7 @@ homepage: "https://github.com/thevilledev/ocaml-curve448"
 doc: "https://github.com/thevilledev/ocaml-curve448/tree/main/docs"
 bug-reports: "https://github.com/thevilledev/ocaml-curve448/issues"
 depends: [
-  "dune" {>= "3.6" & >= "3.6.2"}
+  "dune" {>= "3.6"}
   "ocaml" {>= "4.14.0"}
   "mirage-crypto-rng" {>= "2.0.1"}
   "alcotest" {with-test & >= "1.7.0"}

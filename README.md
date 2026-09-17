@@ -10,7 +10,7 @@ mirage-crypto-ec, with a pure OCaml backend by default and an optional C backend
 
 ## Install
 
-Requires **OCaml 4.14+**, **Dune 3.6.2+**, **opam 2.0+** and a 64-bit platform.
+Requires **OCaml 4.14+**, **Dune 3.6+**, **opam 2.0+** and a 64-bit platform.
 The package is not yet published to opam. Install from a checkout:
 
 ```sh

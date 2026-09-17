@@ -1,7 +1,8 @@
 #!/bin/sh
-# Run in a disposable OCaml 4.14.0 switch. Keep these versions in sync with
-# the inclusive lower bounds in dune-project; these are CI pins, not constraints
-# imposed on users.
+# Run in a disposable OCaml 4.14.0 switch. Keep direct dependency versions in
+# sync with the inclusive lower bounds in dune-project. Dune 3.6.2 is the first
+# published release satisfying the Dune language 3.6 constraint. These are CI
+# pins, not constraints imposed on users.
 set -eu
 cd "$(dirname "$0")/../.."
 
