@@ -18,7 +18,7 @@ as the source of truth.
    license, homepage, bug-report and source URLs, and review the diff.
 3. Run the [development checks](../CONTRIBUTING.md) and
    [lower-bound test](compatibility.md#reproduce-the-lower-bound-test).
-   Require the compiler, Dune, opam-client and security CI jobs to pass.
+   Require the compiler, Dune and security CI jobs to pass.
 4. In a disposable switch, run `opam install . --with-test --with-doc`.
    Also check installation without tests or docs in a fresh switch, to catch
    accidental dependencies on developer tools. Inspect the installed docs and

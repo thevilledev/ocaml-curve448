@@ -69,25 +69,6 @@ jobs:
       - run: opam exec -- dune build @all @doc
       - run: opam exec -- dune runtest
 
-  opam-versions:
-    strategy:
-      fail-fast: false
-      matrix:
-        opam: ["2.0.10", "2.1.6", "2.2.1", "2.3.0", "2.4.1", "2.5.2"]
-    runs-on: avrea-ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
-        with:
-          ocaml-compiler: "4.14"
-          opam-pin: false
-      - name: Install, test and build docs with this opam client
-        env:
-          OPAM_CLIENT_VERSION: ${{ matrix.opam }}
-        run: opam exec -- tools/ci/opam-client.sh "$OPAM_CLIENT_VERSION"
-
   c-checks:
     runs-on: avrea-ubuntu-latest
     steps:

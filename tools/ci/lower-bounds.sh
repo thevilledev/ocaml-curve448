@@ -15,7 +15,7 @@ opam install . --deps-only --with-test --with-doc -y
 for package do
     name=${package%%.*}
     expected=${package#*.}
-    actual=$(opam list --installed --short --columns=version "$name")
+    actual=$(opam list --color=never --installed --short --columns=version "$name")
     if [ "$actual" != "$expected" ]; then
         echo "Expected $name.$expected, found $actual" >&2
         exit 1

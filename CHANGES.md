@@ -28,7 +28,7 @@
   compiled OCaml kernels, a timing check, Crowbar fuzzing, a 44-mutant
   mutation check and benchmarks.
 - Support Dune 3.6 and later, retain opam 2.0 metadata, and test exact
-  dependency lower bounds alongside a compiler and package-manager matrix.
+  dependency lower bounds alongside a compiler matrix.
 - Add focused usage, compatibility, backend, performance and release guides,
   an API documentation landing page, and installed third-party notices.
 - Not independently audited.
