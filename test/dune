@@ -1,0 +1,8 @@
+; Shared test code. The suites in this directory are built and run once per
+; backend, from test/ocaml and test/c.
+
+(library
+ (name support)
+ (wrapped false)
+ (modules support reference protocol)
+ (libraries curve448 curve448.for_testing alcotest qcheck-core yojson zarith))

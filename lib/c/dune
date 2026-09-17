@@ -1,0 +1,30 @@
+; The C implementation of Backend: fiat-crypto p448 field arithmetic and
+; hand-written C for everything above it. Needs a 64-bit GCC or Clang with
+; unsigned __int128.
+
+(library
+ (name curve448_c)
+ (public_name curve448.c)
+ (implements curve448)
+ (foreign_stubs
+  (language c)
+  (names curve448_stubs)
+  (flags :standard))
+ (enabled_if
+  (and
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc))))
+
+; The C sources live in native/ next to their provenance notes.
+
+(copy_files# native/*.{c,h})
+
+(env
+ (dev
+  (c_flags
+   (:standard -Wall -Wextra -Wpedantic -Werror))))

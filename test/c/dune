@@ -1,0 +1,69 @@
+; The test suites linked with the C backend (curve448.c).
+
+(copy_files# ../test_{vectors,reference,properties,domains}.ml)
+
+(tests
+ (names test_vectors test_reference test_properties)
+ (modules test_vectors test_reference test_properties)
+ (package curve448)
+ (enabled_if
+  (and
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc)))
+ (libraries
+  support
+  curve448.c
+  curve448.for_testing
+  alcotest
+  qcheck-core
+  qcheck-alcotest
+  yojson
+  zarith
+  digestif
+  kdf.hkdf
+  mirage-crypto-ec
+  mirage-crypto-rng
+  mirage-crypto-rng.unix)
+ (deps
+  (source_tree ../../test-vectors))
+ (action
+  (setenv
+   CURVE448_TEST_VECTORS
+   ../../test-vectors
+   (run %{test}))))
+
+(executable
+ (name test_domains)
+ (modules test_domains)
+ (libraries support curve448.c mirage-crypto-rng mirage-crypto-rng.unix)
+ (enabled_if
+  (and
+   (>= %{ocaml_version} 5.0.0)
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc))))
+
+(rule
+ (alias runtest)
+ (package curve448)
+ (enabled_if
+  (and
+   (>= %{ocaml_version} 5.0.0)
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc)))
+ (action
+  (run %{exe:test_domains.exe})))

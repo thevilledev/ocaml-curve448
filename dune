@@ -1,0 +1,10 @@
+(install
+ (section doc)
+ (files
+  CONTRIBUTING.md
+  SECURITY.md
+  (licenses/fiat-crypto.txt as licenses/fiat-crypto.txt)
+  (licenses/boringssl.txt as licenses/boringssl.txt)
+  (licenses/tiny_sha3.txt as licenses/tiny_sha3.txt)
+  (test-vectors/wycheproof/LICENSE as test-vectors/wycheproof/LICENSE)
+  (test-vectors/PROVENANCE.md as test-vectors/PROVENANCE.md)))

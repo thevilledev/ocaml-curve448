@@ -1,0 +1,25 @@
+; Differential testing against other implementations; see run.sh.
+
+(executable
+ (name differential)
+ (modules differential)
+ (libraries support curve448.ocaml curve448.for_testing unix yojson zarith))
+
+(rule
+ (copy harness.ml harness_c.ml))
+
+(executable
+ (name harness_c)
+ (modules harness_c)
+ (enabled_if
+  (and
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc)))
+ (libraries support curve448.c))
+
+(data_only_dirs go openssl)

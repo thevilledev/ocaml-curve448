@@ -1,0 +1,39 @@
+; The known-answer tests as a self-contained bytecode executable with the C
+; backend. This exercises the bytecode entry points of the C stubs, such as
+; the one for the six-argument signing primitive.
+
+(copy_files# ../../test_vectors.ml)
+
+(executable
+ (name test_vectors)
+ (modes byte_complete)
+ (enabled_if
+  (and
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc)))
+ (libraries support curve448.c alcotest yojson digestif kdf.hkdf))
+
+(rule
+ (alias runtest)
+ (package curve448)
+ (enabled_if
+  (and
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc)))
+ (deps
+  (source_tree ../../../test-vectors))
+ (action
+  (setenv
+   CURVE448_TEST_VECTORS
+   ../../../test-vectors
+   (run %{dep:test_vectors.bc.exe} --compact))))

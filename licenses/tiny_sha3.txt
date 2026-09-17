@@ -1,0 +1,30 @@
+tiny_sha3
+=========
+
+keccak_f1600 in lib/c/native/shake256.h follows sha3_keccakf from tiny_sha3
+by Markku-Juhani O. Saarinen (https://github.com/mjosaarinen/tiny_sha3): the
+same loop structure over the FIPS 202 round constants, rotation offsets and
+pi lane order. The sponge, padding and squeeze code around it is not derived
+from tiny_sha3. tiny_sha3 is distributed under the MIT License:
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Markku-Juhani O. Saarinen
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

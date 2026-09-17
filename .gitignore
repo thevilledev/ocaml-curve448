@@ -1,0 +1,9 @@
+_build/
+*.install
+*.merlin
+*.swp
+.DS_Store
+fuzz/_afl-*/
+__pycache__/
+_opam/
+_release/

@@ -1,0 +1,8 @@
+; The pure OCaml implementation of Backend (the default). No C, no
+; third-party code; see backend.ml.
+
+(library
+ (name curve448_ocaml)
+ (public_name curve448.ocaml)
+ (implements curve448)
+ (private_modules fe448 fe448_kernels keccak sc448 shake256 ge448 table448))

@@ -1,0 +1,32 @@
+BoringSSL
+=========
+
+Parts of the C backend follow BoringSSL's crypto/curve25519 code, in the
+revision vendored by mirage-crypto-ec (BoringSSL commits c47bfce06 and
+0fc57bef18), which was distributed under the ISC-style license below:
+
+- lib/c/native/curve448.h: the X448 Montgomery ladder is adapted from
+  x25519_scalar_mult_generic (statement order and temporaries, with the
+  Curve448 constant and scalar size);
+- lib/c/native/field448.h: the tight/loose field element types and the
+  fe_* wrapper naming around fiat-crypto;
+- lib/c/native/edwards448.h: the ge_p2/ge_p3/ge_p1p1/ge_precomp/ge_cached
+  point representations and conversion structure, which BoringSSL in turn
+  took from the public-domain ref10 Ed25519 code in SUPERCOP.
+
+The edwards448 formulas, scalar arithmetic, tables and Ed448 logic are not
+derived from BoringSSL.
+
+Copyright (c) 2020, Google Inc.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.

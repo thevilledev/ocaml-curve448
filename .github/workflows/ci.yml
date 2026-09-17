@@ -1,0 +1,223 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "43 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: avrea-ubuntu-latest
+            ocaml: "4.14"
+          - os: avrea-ubuntu-latest
+            ocaml: "5.0"
+          - os: avrea-ubuntu-latest
+            ocaml: "5.1"
+          - os: avrea-ubuntu-latest
+            ocaml: "5.2"
+          - os: avrea-ubuntu-latest
+            ocaml: "5.3"
+          - os: avrea-ubuntu-latest
+            ocaml: "5.4"
+          - os: avrea-ubuntu-latest
+            ocaml: "5.5"
+          - os: avrea-macos-26-8-vcpu
+            ocaml: "4.14"
+          - os: avrea-macos-26-8-vcpu
+            ocaml: "5.5"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml }}
+          dune-cache: true
+      - run: opam install . --deps-only --with-test --with-doc
+      - run: opam exec -- dune build @all @doc
+      - run: opam exec -- dune runtest
+      - name: RFC 7748 one-million-iteration vector
+        if: github.event_name == 'schedule'
+        env:
+          CURVE448_SLOW_TESTS: "1"
+        run: opam exec -- dune runtest --force
+
+  lower-bounds:
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: "4.14.0"
+          cache-prefix: lower-bounds
+      - run: tools/ci/lower-bounds.sh
+
+  dune-versions:
+    strategy:
+      fail-fast: false
+      matrix:
+        dune: ["3.6.2", "3.10.0", "3.15.3"]
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: "4.14"
+          cache-prefix: dune-${{ matrix.dune }}
+      - name: Constrain Dune throughout dependency installation
+        env:
+          DUNE_VERSION: ${{ matrix.dune }}
+        run: |
+          opam pin add dune "$DUNE_VERSION" --no-action
+          opam install . --deps-only --with-test --with-doc
+          test "$(opam exec -- dune --version)" = "$DUNE_VERSION"
+      - run: opam exec -- dune build @all @doc
+      - run: opam exec -- dune runtest
+
+  opam-versions:
+    strategy:
+      fail-fast: false
+      matrix:
+        opam: ["2.0.10", "2.1.6", "2.2.1", "2.3.0", "2.4.1", "2.5.2"]
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: "4.14"
+          opam-pin: false
+      - name: Install, test and build docs with this opam client
+        env:
+          OPAM_CLIENT_VERSION: ${{ matrix.opam }}
+        run: opam exec -- tools/ci/opam-client.sh "$OPAM_CLIENT_VERSION"
+
+  c-checks:
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install compilers, Valgrind and the sanitizer runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc clang valgrind ocaml-nox
+          v=$(clang --version | sed -n 's/.*clang version \([0-9]*\).*/\1/p' | head -n 1)
+          sudo apt-get install -y --no-install-recommends "libclang-rt-$v-dev"
+      - name: Valgrind constant-time check (C and OCaml backends)
+        env:
+          CTGRIND_REQUIRE_OCAML: "1"
+        run: tools/ctgrind/run.sh
+      - name: AddressSanitizer and UndefinedBehaviorSanitizer
+        env:
+          CC: clang
+        run: tools/sanitize/run.sh
+
+  ctgrind-ocaml5:
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: "5.4"
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends valgrind
+      - name: Valgrind constant-time check (OCaml backend, OCaml 5, x86-64 only)
+        env:
+          CTGRIND_SKIP_C: "1"
+          CTGRIND_REQUIRE_OCAML: "1"
+        run: opam exec -- tools/ctgrind/run.sh
+
+  fuzz:
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: "5.5"
+          dune-cache: true
+      - run: opam install . --deps-only --with-test
+      - run: opam exec -- dune build --profile fuzz fuzz/fuzz_curve448_ocaml.exe fuzz/fuzz_curve448_c.exe
+      - name: Fuzz smoke test
+        if: github.event_name != 'schedule'
+        run: |
+          opam exec -- _build/default/fuzz/fuzz_curve448_ocaml.exe --repeat 1000 --seed 448
+          opam exec -- _build/default/fuzz/fuzz_curve448_c.exe --repeat 1000 --seed 448
+      - name: Scheduled fuzz campaign
+        if: github.event_name == 'schedule'
+        run: |
+          opam exec -- _build/default/fuzz/fuzz_curve448_ocaml.exe --repeat 20000 --seed 448
+          opam exec -- _build/default/fuzz/fuzz_curve448_c.exe --repeat 20000 --seed 448
+
+  native-inspection:
+    strategy:
+      fail-fast: false
+      matrix:
+        ocaml: ["4.14", "5.5"]
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml }}
+          dune-cache: true
+      - run: opam install . --deps-only
+      - run: opam exec -- dune build --profile release lib/ocaml/curve448_ocaml.a
+      - run: sh compiler/inspect_ocaml_native.sh
+
+  packaging:
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: "5.5"
+          dune-cache: true
+      - run: opam lint --strict curve448.opam
+      - name: Install without test or documentation dependencies
+        run: opam install .
+      - name: Install with tests and documentation
+        run: opam reinstall curve448 --with-test --with-doc
+
+  hygiene:
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
+        with:
+          ocaml-compiler: "5.5"
+          dune-cache: true
+      - run: opam install . --deps-only --with-test --with-doc
+      - run: opam install ocamlformat.0.29.0
+      - run: opam exec -- dune fmt
+      - run: python3 tools/check_doc_links.py
+      - run: python3 tools/gen_tables.py --check lib/c/native/curve448_tables.h
+      - run: python3 tools/gen_tables.py --ocaml --check lib/ocaml/table448.ml
+      - run: python3 tools/gen_fe448_ocaml.py --check lib/ocaml/fe448_kernels.ml
+      - run: python3 tools/gen_keccak_ocaml.py --check lib/ocaml/keccak.ml
+      - name: No Array.fill or Array.blit in the OCaml backend (see lib/ocaml/fe448.ml)
+        run: "! grep -nE 'Array[.](fill|blit)[^]]' lib/ocaml/*.ml"
+      - run: git diff --exit-code

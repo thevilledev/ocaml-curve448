@@ -1,0 +1,6 @@
+; Internal arithmetic exposed for differential tests. Not a stable API.
+
+(library
+ (name curve448_for_testing)
+ (public_name curve448.for_testing)
+ (libraries curve448))

@@ -1,0 +1,16 @@
+(documentation
+ (package curve448)
+ (mld_files index))
+
+(install
+ (section doc)
+ (files
+  (README.md as docs/README.md)
+  (usage.md as docs/usage.md)
+  (backends.md as docs/backends.md)
+  (compatibility.md as docs/compatibility.md)
+  (design.md as docs/design.md)
+  (interoperability.md as docs/interoperability.md)
+  (performance.md as docs/performance.md)
+  (testing.md as docs/testing.md)
+  (releasing.md as docs/releasing.md)))

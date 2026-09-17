@@ -1,0 +1,11 @@
+; The public API, written against the virtual module Backend. The
+; implementation is chosen at link time: curve448.ocaml (pure OCaml, the
+; default, in ocaml/) or curve448.c (C with fiat-crypto, in c/).
+
+(library
+ (name curve448)
+ (public_name curve448)
+ (modules curve448 backend)
+ (virtual_modules backend)
+ (default_implementation curve448.ocaml)
+ (libraries mirage-crypto-rng))

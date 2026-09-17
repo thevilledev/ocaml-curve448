@@ -1,0 +1,29 @@
+; Crowbar properties, built once per backend.
+
+(rule
+ (copy fuzz_curve448.ml fuzz_curve448_ocaml.ml))
+
+(rule
+ (copy fuzz_curve448.ml fuzz_curve448_c.ml))
+
+(executable
+ (name fuzz_curve448_ocaml)
+ (modules fuzz_curve448_ocaml)
+ (libraries curve448.ocaml support crowbar)
+ (enabled_if
+  (= %{profile} fuzz)))
+
+(executable
+ (name fuzz_curve448_c)
+ (modules fuzz_curve448_c)
+ (libraries curve448.c support crowbar)
+ (enabled_if
+  (and
+   (= %{profile} fuzz)
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc))))

@@ -1,0 +1,22 @@
+{0 curve448}
+
+X448 key agreement and Ed448 / Ed448ph signatures for OCaml.
+
+{1 API}
+
+{!module:Curve448} is the public API. Link [curve448] for the pure OCaml
+backend, or add [curve448.c] for the C backend. Initialise the random number
+generator before generating keys. The [curve448.for_testing] library is
+internal and is not a stable API.
+
+{1 Guides}
+
+See the {{:https://github.com/thevilledev/ocaml-curve448/tree/main/docs}documentation index}
+for usage, backend selection, compatibility, design and testing. Markdown
+guides are also installed in the package's documentation directory.
+
+{1 Security}
+
+This library has not received an independent cryptographic audit. Read the
+{{:https://github.com/thevilledev/ocaml-curve448/blob/main/SECURITY.md}security policy}
+for its audit status and side-channel limitations.

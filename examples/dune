@@ -1,0 +1,11 @@
+(executables
+ (names key_exchange signatures)
+ (libraries curve448 mirage-crypto-rng.unix))
+
+(rule
+ (alias runtest)
+ (package curve448)
+ (action
+  (progn
+   (run %{exe:key_exchange.exe})
+   (run %{exe:signatures.exe}))))

@@ -1,0 +1,59 @@
+# Compatibility
+
+[Documentation](README.md) · [Project home](../README.md)
+
+## Requirements
+
+| Component | Minimum | Reason |
+| --- | --- | --- |
+| OCaml | 4.14.0 | Required by mirage-crypto-rng; 63-bit OCaml integers are required |
+| Dune | 3.6.2 | Dune 3.6 supports the self-contained bytecode test; 3.6.2 is the tested patch release |
+| opam | 2.0 | Metadata uses format 2.0 and avoids newer-only dependency filters |
+| mirage-crypto-rng | 2.0.1 | The RNG API used by the examples and domain tests |
+
+There are no preventive upper bounds. The C backend requires GCC or Clang
+with `unsigned __int128`; MSVC builds use the OCaml backend. Installing the
+package also builds the C backend where supported, and mirage-crypto-rng has
+its own C stubs. A normal OCaml C toolchain is therefore needed for an opam
+installation even if the application links only the OCaml backend.
+
+32-bit runtimes and js_of_ocaml are unsupported. opam excludes the known
+32-bit architectures, and the OCaml backend checks `Sys.int_size` at startup.
+The C backend's Dune guards use compiler architecture names so they work on
+older Dune releases too.
+
+## CI coverage
+
+The [workflow](../.github/workflows/ci.yml) defines these checks:
+
+| Check | Versions |
+| --- | --- |
+| Linux build, tests and API docs | OCaml 4.14 and each 5.x series through 5.5 |
+| macOS build, tests and API docs | OCaml 4.14 and 5.5 |
+| Older Dune, on OCaml 4.14 | 3.6.2, 3.10.0 and 3.15.3 |
+| Latest Dune | Resolved by opam in the regular compiler matrix |
+| opam clients, on Linux / OCaml 4.14 | 2.0.10, 2.1.6, 2.2.1, 2.3.0, 2.4.1 and 2.5.2 |
+| Exact lower bounds | OCaml 4.14.0, Dune 3.6.2 and all direct dependency minima |
+
+Old opam clients each get a fresh root. Old Dune releases run on OCaml 4.14
+because they do not support every newer compiler. This matrix is the CI
+configuration, not a claim that every listed job has already passed on every
+platform. Windows is not currently in CI.
+
+## Reproduce the lower-bound test
+
+Use a disposable switch: this intentionally selects older dependencies.
+
+```sh
+opam switch create . 4.14.0 --no-install
+tools/ci/lower-bounds.sh
+```
+
+The script installs each direct dependency at its declared minimum, including
+test and documentation dependencies, and checks the installed versions before
+building, testing and building the API docs. It also runs both fuzzers at the
+minimum Crowbar version. Transitive dependencies are left to opam's solver.
+The exact pins are test inputs only; they do not constrain package users.
+
+Update the script whenever a bound changes in `dune-project`. CI also checks
+that Dune regenerates the committed opam file without changes.

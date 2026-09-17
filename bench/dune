@@ -1,0 +1,33 @@
+; Benchmarks and the timing check, built once per backend:
+; bench_curve448_ocaml.exe, bench_curve448_c.exe, timing_ocaml.exe, timing_c.exe.
+
+(rule
+ (copy bench_curve448.ml bench_curve448_ocaml.ml))
+
+(rule
+ (copy bench_curve448.ml bench_curve448_c.ml))
+
+(rule
+ (copy timing.ml timing_ocaml.ml))
+
+(rule
+ (copy timing.ml timing_c.ml))
+
+(executables
+ (names bench_curve448_ocaml timing_ocaml)
+ (modules bench_curve448_ocaml timing_ocaml)
+ (libraries curve448.ocaml curve448.for_testing mirage-crypto-ec unix))
+
+(executables
+ (names bench_curve448_c timing_c)
+ (modules bench_curve448_c timing_c)
+ (enabled_if
+  (and
+   (or
+    (= %{architecture} amd64)
+    (= %{architecture} arm64)
+    (= %{architecture} power)
+    (= %{architecture} s390x)
+    (= %{architecture} riscv))
+   (<> %{ccomp_type} msvc)))
+ (libraries curve448.c curve448.for_testing mirage-crypto-ec unix))

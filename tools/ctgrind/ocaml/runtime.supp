@@ -1,0 +1,38 @@
+# Valgrind suppressions for the OCaml backend's constant-time check
+# (OCaml 4.14 runtime).
+#
+# When the garbage collector scans a block or a stack frame, it tests the tag
+# bit of every field (Is_block) to tell pointers from integers. The library
+# holds secrets only in integer limbs, bytes and unboxed int64 locals, so every
+# secret-derived field the collector sees is an OCaml int, whose tag bit is
+# always 1. Valgrind cannot see that: its approximation of multiplication
+# marks every bit of a product undefined, including the tag bit OCaml sets
+# afterwards. Only conditional jumps in the scanning functions are suppressed;
+# a secret-dependent branch or memory access anywhere else, including other
+# runtime primitives such as caml_array_fill, is still reported.
+
+{
+   ocaml-major-gc-do-some-marking
+   Memcheck:Cond
+   fun:do_some_marking
+}
+{
+   ocaml-major-gc-mark-slice-darken
+   Memcheck:Cond
+   fun:mark_slice_darken
+}
+{
+   ocaml-major-gc-darken
+   Memcheck:Cond
+   fun:caml_darken
+}
+{
+   ocaml-minor-gc-oldify-one
+   Memcheck:Cond
+   fun:caml_oldify_one
+}
+{
+   ocaml-minor-gc-oldify-local-roots
+   Memcheck:Cond
+   fun:caml_oldify_local_roots
+}
