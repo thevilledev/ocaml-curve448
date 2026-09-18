@@ -16,7 +16,7 @@
 (executables
  (names bench_curve448_ocaml timing_ocaml)
  (modules bench_curve448_ocaml timing_ocaml)
- (libraries curve448.ocaml curve448.for_testing mirage-crypto-ec unix))
+ (libraries curve448.ocaml curve448_for_testing mirage-crypto-ec unix))
 
 (executables
  (names bench_curve448_c timing_c)
@@ -30,4 +30,4 @@
     (= %{architecture} s390x)
     (= %{architecture} riscv))
    (<> %{ccomp_type} msvc)))
- (libraries curve448.c curve448.for_testing mirage-crypto-ec unix))
+ (libraries curve448.c curve448_for_testing mirage-crypto-ec unix))

@@ -6,8 +6,7 @@ X448 key agreement and Ed448 / Ed448ph signatures for OCaml.
 
 {!module:Curve448} is the public API. Link [curve448] for the pure OCaml
 backend, or add [curve448.c] for the C backend. Initialise the random number
-generator before generating keys. The [curve448.for_testing] library is
-internal and is not a stable API.
+generator before generating keys.
 
 {1 Guides}
 

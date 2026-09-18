@@ -341,8 +341,8 @@ Evidence, in [`SECURITY.md`](../SECURITY.md) in more detail:
   without releasing the domain lock, as mirage-crypto does for its hashes.
 - Lengths are validated in OCaml. The public-API stubs check them again and
   report a mismatch through their result, which the OCaml side turns into an
-  exception; the internal test stubs rely on the checks in
-  `curve448.for_testing`.
+  exception; the internal test stubs rely on the checks in the private
+  `curve448_for_testing` library.
 - The six-argument signing stub has a separate bytecode entry point, exercised
   by the `byte_complete` test build.
 

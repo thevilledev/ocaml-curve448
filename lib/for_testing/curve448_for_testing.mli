@@ -1,8 +1,9 @@
 (** Internal arithmetic of [curve448], for tests only.
 
     This interface exists so the test suite can compare the C field, scalar and
-    group arithmetic against an independent big-integer model. It is not a
-    stable API and offers no protection against misuse.
+    group arithmetic against an independent big-integer model. It is a private
+    library that is not installed with the package, not a stable API, and offers
+    no protection against misuse.
 
     Field elements are 56-byte little-endian strings; inputs may be any 56 bytes
     (they are reduced), outputs are canonical. Scalars mod L are 57-byte

@@ -1,6 +1,6 @@
-; Internal arithmetic exposed for differential tests. Not a stable API.
+; Internal arithmetic for the differential tests, benchmarks and tools. A
+; private library: not installed with the package and not a stable API.
 
 (library
  (name curve448_for_testing)
- (public_name curve448.for_testing)
  (libraries curve448))

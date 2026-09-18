@@ -5,6 +5,8 @@
 (library
  (name curve448)
  (public_name curve448)
+ (synopsis
+  "X448 key agreement and Ed448/Ed448ph signatures (RFC 7748, RFC 8032)")
  (modules curve448 backend)
  (virtual_modules backend)
  (default_implementation curve448.ocaml)

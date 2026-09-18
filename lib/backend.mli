@@ -37,11 +37,11 @@ val ed448_verify : string -> string -> int -> string -> string -> bool
 val shake256 : bytes -> string -> unit
 (** [shake256 out msg] fills [out] with SHAKE256([msg], length of [out]). *)
 
-(** Internal arithmetic for the differential tests in [curve448.for_testing];
-    not part of the supported API. Field elements are 56-byte strings (any
-    value; outputs are canonical), scalars are 56- or 57-byte strings as noted,
-    and points are 57-byte RFC 8032 encodings. Lengths are checked by the
-    caller. *)
+(** Internal arithmetic for the differential tests in the private
+    [curve448_for_testing] library ([lib/for_testing]); not part of the
+    supported API. Field elements are 56-byte strings (any value; outputs are
+    canonical), scalars are 56- or 57-byte strings as noted, and points are
+    57-byte RFC 8032 encodings. Lengths are checked by the caller. *)
 module Internal : sig
   val fe_add : bytes -> string -> string -> unit
   val fe_sub : bytes -> string -> string -> unit

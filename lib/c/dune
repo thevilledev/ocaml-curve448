@@ -5,6 +5,7 @@
 (library
  (name curve448_c)
  (public_name curve448.c)
+ (synopsis "C implementation of curve448 with fiat-crypto field arithmetic")
  (implements curve448)
  (foreign_stubs
   (language c)

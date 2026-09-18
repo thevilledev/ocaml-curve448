@@ -5,4 +5,4 @@
  (name support)
  (wrapped false)
  (modules support reference protocol)
- (libraries curve448 curve448.for_testing alcotest qcheck-core yojson zarith))
+ (libraries curve448 curve448_for_testing alcotest qcheck-core yojson zarith))

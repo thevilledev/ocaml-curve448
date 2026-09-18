@@ -46,8 +46,8 @@ CURVE448_SLOW_TESTS=1 dune test --force
 `test/reference.ml` is a separate implementation of RFC 7748 and RFC 8032 on
 Zarith integers and affine coordinates. It shares no arithmetic with either
 backend (it borrows only SHAKE256, which has its own vectors). Through the
-internal `curve448.for_testing` library, which reaches each backend's test
-hooks, QCheck compares against it:
+private `curve448_for_testing` library (`lib/for_testing`, not installed),
+which reaches each backend's test hooks, QCheck compares against it:
 
 - every field operation, including multiplication of differences (fiat's loose
   inputs in C), square-root ratios, inversion of zero and inputs >= p;

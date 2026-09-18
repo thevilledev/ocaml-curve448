@@ -18,7 +18,7 @@
  (libraries
   support
   curve448.c
-  curve448.for_testing
+  curve448_for_testing
   alcotest
   qcheck-core
   qcheck-alcotest

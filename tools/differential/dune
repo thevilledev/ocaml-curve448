@@ -3,7 +3,7 @@
 (executable
  (name differential)
  (modules differential)
- (libraries support curve448.ocaml curve448.for_testing unix yojson zarith))
+ (libraries support curve448.ocaml curve448_for_testing unix yojson zarith))
 
 (rule
  (copy harness.ml harness_c.ml))

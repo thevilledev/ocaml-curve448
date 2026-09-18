@@ -4,5 +4,6 @@
 (library
  (name curve448_ocaml)
  (public_name curve448.ocaml)
+ (synopsis "Pure OCaml implementation of curve448 (the default)")
  (implements curve448)
  (private_modules fe448 fe448_kernels keccak sc448 shake256 ge448 table448))

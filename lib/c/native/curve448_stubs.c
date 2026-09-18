@@ -6,7 +6,7 @@
  * public API check them again and report a mismatch through their result
  * (false, or no verification), which the wrappers turn into an exception; the
  * internal test bindings at the end of the file rely on the length checks in
- * curve448.for_testing. */
+ * curve448_for_testing. */
 
 #include <caml/mlvalues.h>
 
@@ -74,7 +74,7 @@ CAMLprim value mc448_shake256(value out, value msg) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Internal operations exposed to the test suite through curve448.for_testing.
+/* Internal operations exposed to the test suite through curve448_for_testing.
  * Field elements are 56-byte little-endian strings (any value, reduced on
  * input), outputs are canonical. Points are 57-byte RFC 8032 encodings. */
 
