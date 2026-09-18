@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (2026-09-17)
+## 0.1.0 (2026-09-18)
 
 - Add `Curve448.X448`, RFC 7748 Diffie-Hellman with the module type of
   `Mirage_crypto_ec.Dh`, returning `` `Low_order `` for all-zero shared secrets.

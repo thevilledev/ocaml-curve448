@@ -5,9 +5,6 @@ X448 key agreement and Ed448 / Ed448ph signatures for OCaml, following
 [RFC 8032](https://www.rfc-editor.org/rfc/rfc8032). The API follows
 mirage-crypto-ec, with a pure OCaml backend by default and an optional C backend.
 
-**Unreleased (planned 0.1.0), not independently audited.** Read the
-[security policy](SECURITY.md) before using it.
-
 ## Install
 
 Requires **OCaml 4.14+**, **Dune 3.6+**, **opam 2.0+** and a 64-bit platform.
