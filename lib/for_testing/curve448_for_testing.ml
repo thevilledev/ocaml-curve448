@@ -125,6 +125,28 @@ module Point = struct
     with_out 57 (fun out -> base_table_entry_ out j t)
 end
 
+module Ed448 = struct
+  let public_ = B.ed448_public
+  let sign_ = B.ed448_sign
+  let verify_ = B.ed448_verify
+
+  let public seed =
+    check_length "Ed448.public" 57 seed;
+    let out, ok = with_out 57 (fun out -> public_ out seed) in
+    if not ok then invalid_arg "Ed448.public";
+    out
+
+  let sign ~phflag ~ctx seed msg =
+    if String.length ctx > 255 then invalid_arg "Ed448.sign";
+    let pub = public seed in
+    let out, ok = with_out 114 (fun out -> sign_ out seed pub phflag ctx msg) in
+    if not ok then invalid_arg "Ed448.sign";
+    out
+
+  let verify ~phflag ~ctx pub signature msg =
+    verify_ signature pub phflag ctx msg
+end
+
 let shake256_ = B.shake256
 
 let shake256 n msg =

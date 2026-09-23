@@ -276,6 +276,31 @@ let ed448_malleability () =
     "nonzero final octet is rejected" false
     (Ed448.verify ~key:(pub ()) (Bytes.to_string top) ~msg)
 
+(* The backend takes phflag as an int. Both implementations must treat every
+   nonzero value as Ed448ph (phflag 1) and must not raise. The OCaml backend
+   used to put the value itself into dom4, and Char.chr raised for values that
+   do not fit in a byte; the C stubs read it with Int_val, which keeps only the
+   low 32 bits, so min_int and 2^61 signed as Ed448. *)
+let ed448_backend_phflag () =
+  let module T = Curve448_for_testing.Ed448 in
+  let seed = pattern ~seed:3 57 and digest = pattern ~seed:4 64 in
+  let pub = T.public seed in
+  let ph = T.sign ~phflag:1 ~ctx:"" seed digest in
+  let key = get_ok (Ed448.priv_of_octets seed) in
+  Alcotest.(check string)
+    "phflag 1 is Ed448ph"
+    (Ed448ph.sign_prehashed ~key digest)
+    ph;
+  List.iter
+    (fun phflag ->
+      let name = Printf.sprintf "phflag %d" phflag in
+      Alcotest.(check string) name ph (T.sign ~phflag ~ctx:"" seed digest);
+      Alcotest.(check bool) name true (T.verify ~phflag ~ctx:"" pub ph digest))
+    [ 2; 255; 256; -1; max_int; min_int; 1 lsl 32; 1 lsl 61; -(1 lsl 61) ];
+  Alcotest.(check bool)
+    "phflag 0 is Ed448" false
+    (T.verify ~phflag:0 ~ctx:"" pub ph digest)
+
 let ed448_tests =
   let gen =
     G.triple (qcheck_bytes 57)
@@ -338,6 +363,7 @@ let () =
           Alcotest.test_case "Ed448 and Ed448ph" `Quick
             ed448_variants_are_separated;
           Alcotest.test_case "malleability" `Quick ed448_malleability;
+          Alcotest.test_case "backend phflag" `Quick ed448_backend_phflag;
         ]
         @ ed448_tests );
     ]

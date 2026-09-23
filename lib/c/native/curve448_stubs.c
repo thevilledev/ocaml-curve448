@@ -6,7 +6,8 @@
  * public API check them again and report a mismatch through their result
  * (false, or no verification), which the wrappers turn into an exception; the
  * internal test bindings at the end of the file rely on the length checks in
- * curve448_for_testing. */
+ * curve448_for_testing. phflag is read with Long_val, not Int_val, which
+ * would truncate it to a 32-bit int: any nonzero OCaml int selects Ed448ph. */
 
 #include <caml/mlvalues.h>
 
@@ -44,7 +45,7 @@ CAMLprim value mc448_ed448_sign(value sig, value seed, value pub, value phflag,
       caml_string_length(context) > ED448_MAX_CONTEXT)
     return Val_false;
   ed448_sign(BYTES_PTR(sig), STRING_PTR(seed), STRING_PTR(pub),
-             (uint8_t)(Int_val(phflag) != 0), STRING_PTR(context),
+             (uint8_t)(Long_val(phflag) != 0), STRING_PTR(context),
              (uint8_t)caml_string_length(context), STRING_PTR(msg),
              caml_string_length(msg));
   return Val_true;
@@ -61,7 +62,7 @@ CAMLprim value mc448_ed448_verify(value sig, value pub, value phflag,
       caml_string_length(context) > ED448_MAX_CONTEXT)
     return Val_false;
   return Val_bool(ed448_verify(STRING_PTR(sig), STRING_PTR(pub),
-                               (uint8_t)(Int_val(phflag) != 0),
+                               (uint8_t)(Long_val(phflag) != 0),
                                STRING_PTR(context),
                                (uint8_t)caml_string_length(context),
                                STRING_PTR(msg), caml_string_length(msg)));

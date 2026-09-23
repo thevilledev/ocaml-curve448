@@ -68,9 +68,10 @@ which reaches each backend's test hooks, QCheck compares against it:
 
 Error variants and lengths, clamping invariance, significance of bit 447,
 reduction of non-canonical u, context limits and domain separation between
-Ed448, Ed448ph and contexts, S + L rejection, `?g` determinism, and
-compile-time checks that `X448 : Mirage_crypto_ec.Dh`, that the error types
-coincide, and that Ed448 adapts to `Mirage_crypto_ec.Ed25519`'s signature.
+Ed448, Ed448ph and contexts, S + L rejection, the same handling of any
+`phflag` by both backends, `?g` determinism, and compile-time checks that
+`X448 : Mirage_crypto_ec.Dh`, that the error types coincide, and that Ed448
+adapts to `Mirage_crypto_ec.Ed25519`'s signature.
 
 ### Generated kernels: `test/ocaml/test_kernels.ml`
 

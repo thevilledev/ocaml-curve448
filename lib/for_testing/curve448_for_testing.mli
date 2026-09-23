@@ -65,6 +65,19 @@ module Point : sig
       whether its stored d x y is consistent. *)
 end
 
+(** The backend's Ed448 functions, called directly with any [phflag] (the public
+    API only passes 0 and 1). *)
+module Ed448 : sig
+  val public : string -> string
+  (** [public seed] is the 57-byte public key of the 57-byte [seed]. *)
+
+  val sign : phflag:int -> ctx:string -> string -> string -> string
+  (** [sign ~phflag ~ctx seed msg] signs [msg] (at most 255 bytes of [ctx]). *)
+
+  val verify : phflag:int -> ctx:string -> string -> string -> string -> bool
+  (** [verify ~phflag ~ctx pub signature msg] *)
+end
+
 val shake256 : int -> string -> string
 (** [shake256 n msg] is SHAKE256([msg], [n]). *)
 

@@ -70,13 +70,14 @@ let x448 (out : bytes) (scalar : string) (u : string) =
     Fe.bytes_equal out (Bytes.unsafe_of_string zeros) 56 = 0
   end
 
-(* dom4(phflag, context) = "SigEd448" || octet(phflag) || octet(len) ||
-   context *)
+(* dom4(phflag, context) = "SigEd448" || octet(phflag) || octet(len) || context.
+   As in the C backend, any nonzero [phflag] selects Ed448ph (octet 1). The
+   callers check that [ctx] is at most 255 bytes. *)
 let absorb_dom4 hash phflag ctx =
   Shake256.absorb hash "SigEd448";
   Shake256.absorb hash
     (String.init 2 (function
-      | 0 -> Char.chr phflag
+      | 0 -> if phflag = 0 then '\000' else '\001'
       | _ -> Char.chr (String.length ctx)));
   Shake256.absorb hash ctx
 

@@ -26,13 +26,14 @@ val ed448_pub_ok : string -> bool
 
 val ed448_sign : bytes -> string -> string -> int -> string -> string -> bool
 (** [ed448_sign out seed pub phflag ctx msg] writes the 114-byte signature of
-    [msg] ([PH(M)] when [phflag] is 1) under [seed] with context [ctx] (at most
-    255 bytes); [pub] must be the public key of [seed]. Returns [false], writing
-    nothing, on a length mismatch. *)
+    [msg] under [seed] with context [ctx] (at most 255 bytes); [pub] must be the
+    public key of [seed]. [phflag] 0 selects Ed448 and any other value Ed448ph,
+    for which [msg] is [PH(M)]. Returns [false], writing nothing, on a length
+    mismatch. *)
 
 val ed448_verify : string -> string -> int -> string -> string -> bool
 (** [ed448_verify signature pub phflag ctx msg] checks an Ed448 ([phflag] 0) or
-    Ed448ph ([phflag] 1) signature with the cofactored equation. *)
+    Ed448ph ([phflag] nonzero) signature with the cofactored equation. *)
 
 val shake256 : bytes -> string -> unit
 (** [shake256 out msg] fills [out] with SHAKE256([msg], length of [out]). *)
