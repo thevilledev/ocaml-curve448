@@ -178,27 +178,44 @@ their inputs), and the compilers.
 
 The proofs found no functional bug in either implementation: every
 function covered above computes its specification for all inputs, and no
-intermediate value overflows. They did find:
+intermediate value overflows. They did find the following, each fixed on its
+own branch:
 
-1. **A false premise in a correctness comment** (`lib/ocaml/fe448.ml`,
-   `to_bytes`). The comment says "A tight element has |value| < 2^447 (1 +
-   2^-22)", but the largest tight value exceeds that bound by about 2^419.
-   The correct bound is below 2^447 (1 + 2^-21). The code is correct: it
-   needs only |value| < p (`Bnd_lt`), which holds with a wide margin.
+1. **A false premise in a correctness comment**
+   (`claude/fix-fe448-tight-bound-comment`). In `lib/ocaml/fe448.ml`, the
+   comment on `to_bytes` says "A tight element has |value| < 2^447 (1 +
+   2^-22)", but the largest tight value, (2^27 + 2^5)(2^448 - 1)/(2^28 - 1),
+   exceeds that by about 2^419. The correct bound is below 2^447 (1 + 2^-21).
+   The code is correct: the argument only needs |value| < p (`Bnd_lt`), which
+   holds with a wide margin.
 2. **A soundness gap in the kernel generator's bound argument**
-   (`tools/gen_fe448_ocaml.py`). The `exact=HALF` overrides for carry
-   remainders are trusted hints; nothing checks that the statement they
-   annotate has the carry-remainder shape. The generated file is correct (the
-   Lean analyser checks the pattern), but a change to a rounding constant or
-   shift in the generator would have gone unnoticed by its own "proof". Its
-   random test also computes the expected value from the environment after
-   the program has run, so a statement rebinding an input name would compare
-   against the wrong value.
-3. **The OCaml and C backends disagree on `phflag` outside {0, 1}**
-   (`lib/ocaml/backend.ml`). The C stubs map any non-zero `phflag` to 1. The
-   OCaml backend writes the value into dom4 as is, and raises
-   `Invalid_argument` from `Char.chr` for values outside 0..255, although
-   `backend.mli` says the backend functions never raise. The public API only
-   passes 0 or 1, so this is not reachable through `Curve448`.
+   (`claude/fix-gen-fe448-remainder-hints`). In `tools/gen_fe448_ocaml.py`, the
+   `exact=HALF` overrides for carry remainders were trusted hints; nothing
+   checked that the statement they annotate has the carry-remainder shape.
+   With the rounding constant in `serial_carry` changed from 2^27 to 2^26, the
+   interval analysis still reported every kernel's outputs as tight; only the
+   random tests noticed. The generated file is correct (the Lean analyser checks
+   the pattern itself). The generator's random test also took the expected
+   value from the environment after the program had run.
+3. **The backends disagreed on `phflag` values other than 0 and 1**
+   (`claude/fix-ocaml-backend-phflag`). The OCaml backend wrote the value into
+   dom4 as is, so 2 gave a signature that is neither Ed448 nor Ed448ph, and it
+   raised `Invalid_argument` from `Char.chr` outside 0..255, although
+   `backend.mli` says the backend functions never raise. The regression test
+   written for this then showed that the C stubs read `phflag` with
+   `Int_val`, which truncates to a 32-bit `int`, so `min_int`, 2^61 and every
+   other multiple of 2^32 selected Ed448. The public API only passes 0 or 1,
+   so neither case is reachable through `Curve448`.
 
-Each is fixed on its own branch; see the summary that accompanies this work.
+Observations that were not changed:
+
+- `shake256.ml`'s `absorb_sub` and `squeeze` use unchecked accesses and rely
+  on their callers for `off + len` and for the absorb, finalize, squeeze order.
+  Absorbing after squeezing would write past the 200-byte state. The module is
+  private and every caller is correct (see `tla/README.md`).
+- The C test stub `mc448_test_base_table_entry` also reads its indices with
+  `Int_val`. `curve448_for_testing` range-checks them first, so this matters
+  only when the stub is called directly.
+- The operation counts in `docs/design.md`'s cost table are marked
+  approximate and are off by one or two. For example, the inversion is 466
+  operations (`powP34_cost` plus three), not 465.
