@@ -96,10 +96,12 @@ let p_limbs = Array.init limbs (fun i -> if i = 8 then mask28 - 1 else mask28)
 
 (* The canonical 56-byte encoding of h.
 
-   A tight element has |value| < 2^447 (1 + 2^-22). Floor carries give unsigned
-   limbs and a top carry c in {-1, 0}; folding c 2^448 as c (2^224 + 1) and
-   carrying again leaves U in [0, 2^448), congruent to h. As 2^448 < 2p, one
-   masked subtraction of p gives the canonical representative. *)
+   The value of a tight element is at most (2^27 + 2^5) (2^448 - 1) / (2^28 - 1)
+   in absolute value, which is below 2^447 (1 + 2^-21) and so below p. Floor
+   carries give unsigned limbs and a top carry c in {-1, 0}; folding c 2^448 as
+   c (2^224 + 1) and carrying again leaves U in [0, 2^448), congruent to h. As
+   2^448 < 2p, one masked subtraction of p gives the canonical
+   representative. *)
 let to_bytes (out : bytes) off (h : t) =
   let u = Array.make limbs 0 and w = Array.make limbs 0 in
   let c = ref 0 in
