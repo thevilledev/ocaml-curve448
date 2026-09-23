@@ -1,0 +1,6 @@
+name = "curve448_formal"
+version = "0.1.0"
+defaultTargets = ["Curve448Formal"]
+
+[[lean_lib]]
+name = "Curve448Formal"

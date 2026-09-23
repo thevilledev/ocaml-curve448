@@ -104,8 +104,10 @@ absolute value; outputs may alias inputs.
   generated statements that no intermediate leaves the 63-bit integer range
   (the largest, in multiplication and squaring, is below 2^60.33) and that
   every output is tight, and checks each kernel on random and extreme inputs
-  with Python integers. The kernels are straight-line code: they load their
-  inputs, compute, and store.
+  with Python integers. A Lean 4 proof over the parsed kernels
+  ([`formal/`](../formal/README.md)) shows the same and, in addition, that
+  each kernel computes the right value modulo p. The kernels are
+  straight-line code: they load their inputs, compute, and store.
 - **Encoding.** Decoding accepts all 2^448 byte strings and keeps values >= p
   congruent. Encoding computes the canonical representative: floor carries
   make the limbs unsigned with a top carry of -1 or 0, which is folded back;
@@ -162,10 +164,14 @@ The S < L check is a borrow chain over all 57 bytes. The signed radix-16
 recoding (digits in [-8, 7]) uses only shifts and additions on the secret
 nibbles.
 
-This layer is not formally verified in either implementation. It is checked
-against Zarith on random inputs and on edge cases (0, L - 1, L, L + 1,
-2^912 - 1, L^2, ...), and mutation testing confirms that dropping a fold, a
-wrong fold constant or a broken final subtraction is caught.
+Both implementations of this layer are proved correct in Lean 4
+(`formal/lean/Curve448Formal/Sc448*.lean`). The proofs cover every input:
+reduction, `muladd`, byte encoding and decoding, the S < L check and the
+recoding. They include the bounds above and the absence of overflow in the
+28-bit and 32-bit accumulators. The layer is also checked against Zarith on
+random inputs and on edge cases (0, L - 1, L, L + 1, 2^912 - 1, L^2, ...),
+and mutation testing confirms that dropping a fold, a wrong fold constant or a
+broken final subtraction is caught.
 
 ## SHAKE256
 
