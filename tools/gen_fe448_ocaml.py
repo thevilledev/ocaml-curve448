@@ -35,9 +35,11 @@ their operations do not wait on each other.
 
 This script proves, by interval arithmetic over the generated statements, that
 no intermediate leaves the 63-bit OCaml integer range (and so also the int64
-range) and that outputs are tight; it also evaluates the kernels on random and
-extreme inputs with Python integers and checks the results modulo p. The OCaml
-test suite compares the kernels with a Zarith model as well.
+range) and that outputs are tight. The sharper bound [-2^27, 2^27) of a carry
+remainder x - ((x + 2^27) asr 28) 2^28 is used only after checking that the
+statement has exactly that shape. The script also evaluates the kernels on
+random and extreme inputs with Python integers and checks the results modulo p.
+The OCaml test suite compares the kernels with a Zarith model as well.
 
 Usage:
   python3 tools/gen_fe448_ocaml.py > lib/ocaml/fe448_kernels.ml
@@ -71,7 +73,9 @@ class Program:
     def let(self, name, expr, exact=None):
         """Bind name to expr. [exact] overrides the interval bound of the
         result when it is known more precisely, as for the remainder
-        x - ((x + 2^27) asr 28) 2^28, which lies in [-2^27, 2^27)."""
+        x - ((x + 2^27) asr 28) 2^28, which lies in [-2^27, 2^27). The
+        analysis accepts the override only for a statement of exactly that
+        shape (see check_remainder)."""
         if exact is not None:
             self.exact[len(self.stmts)] = exact
         self.stmts.append((name, expr))
@@ -292,15 +296,46 @@ def build_linear(kind):
     raise ValueError(kind)
 
 
+def names_in(expr):
+    if isinstance(expr, str):
+        return {expr}
+    if isinstance(expr, int):
+        return set()
+    if expr[0] == "sum":
+        return set().union(*(names_in(t) for t in expr[1]))
+    return set().union(*(names_in(t) for t in expr[1:] if not isinstance(t, int)))
+
+
+def check_remainder(kernel, index, expr, defs):
+    """An exact bound of HALF is justified only for r = x - (c lsl RADIX)
+    where c is bound to (x + HALF) asr RADIX for the same x and no name in x
+    is rebound between c and r: then c = floor((x + 2^27) / 2^28) and r is in
+    [-2^27, 2^27). Anything else is a generator bug."""
+    ok = (kernel.prog.exact[index] == HALF and isinstance(expr, tuple) and expr[0] == "-"
+          and isinstance(expr[2], tuple) and expr[2][0] == "lsl" and expr[2][2] == RADIX
+          and isinstance(expr[2][1], str))
+    if ok:
+        x, c = expr[1], expr[2][1]
+        cdef = defs.get(c)
+        ok = (cdef is not None and cdef[1] == ("asr", ("+", x, HALF), RADIX)
+              and all(defs[v][0] < cdef[0] for v in names_in(x) if v in defs))
+    if not ok:
+        raise SystemExit("%s: statement %d (%s) is not a carry remainder, so its exact bound is "
+                         "unjustified" % (kernel.name, index, kernel.prog.stmts[index][0]))
+
+
 def analyse(kernel):
     bounds = dict(kernel.inputs)
     peak = max(kernel.inputs.values())
+    defs = {}  # name -> (index, expr) of its latest binding
     for index, (name, expr) in enumerate(kernel.prog.stmts):
         value, sub_peak = Program.bound(expr, bounds)
         peak = max(peak, sub_peak)
         if index in kernel.prog.exact:
+            check_remainder(kernel, index, expr, defs)
             value = kernel.prog.exact[index]
         bounds[name] = value
+        defs[name] = (index, expr)
     return bounds, peak
 
 
@@ -322,23 +357,24 @@ def check(kernel):
         extreme = trial % 4 == 0
         for name, bound in kernel.inputs.items():
             env[name] = rng.choice((-bound, bound)) if extreme else rng.randint(-bound, bound)
+        inputs = dict(env)  # the expected value is computed from these
         for name, expr in kernel.prog.stmts:
             v = Program.evaluate(expr, env)
             assert -OCAML_MAX - 1 <= v <= OCAML_MAX, kernel.name
             env[name] = v
         result = [env[n] for n in kernel.outputs]
         assert all(abs(l) <= TIGHT for l in result), kernel.name
-        va = value([env["a%d" % i] for i in range(LIMBS)])
+        va = value([inputs["a%d" % i] for i in range(LIMBS)])
         if kernel.name == "mul":
-            expected = va * value([env["b%d" % i] for i in range(LIMBS)])
+            expected = va * value([inputs["b%d" % i] for i in range(LIMBS)])
         elif kernel.name == "sq":
             expected = va * va
         elif kernel.name == "add":
-            expected = va + value([env["b%d" % i] for i in range(LIMBS)])
+            expected = va + value([inputs["b%d" % i] for i in range(LIMBS)])
         elif kernel.name == "sub":
-            expected = va - value([env["b%d" % i] for i in range(LIMBS)])
+            expected = va - value([inputs["b%d" % i] for i in range(LIMBS)])
         elif kernel.name == "mul_small":
-            expected = va * env["k"]
+            expected = va * inputs["k"]
         else:
             expected = va
         assert (value(result) - expected) % P == 0, kernel.name
