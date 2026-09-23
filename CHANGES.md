@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Add `formal/`: Lean 4 proofs of both implementations covering scalar
+  arithmetic modulo L, the generated OCaml field kernels (correctness modulo
+  p, tightness, no overflow), the OCaml canonical field encoding, the
+  exponentiation chains, Keccak-f[1600], the selection helpers and the curve
+  and ladder formulas. TLA+ models cover the SHAKE256 sponges, the X448
+  ladder's conditional swaps and the scalar-multiplication schedules.
+
 ## 0.1.0 (2026-09-18)
 
 - Add `Curve448.X448`, RFC 7748 Diffie-Hellman with the module type of

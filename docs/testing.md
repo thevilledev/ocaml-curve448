@@ -101,6 +101,22 @@ python3 tools/gen_fe448_ocaml.py --check lib/ocaml/fe448_kernels.ml
 python3 tools/gen_keccak_ocaml.py --check lib/ocaml/keccak.ml
 ```
 
+## Formal verification
+
+[`formal/`](../formal/README.md) holds Lean 4 proofs and TLA+ models of both
+implementations: scalar arithmetic modulo L, the field kernels and encoding,
+Keccak-f[1600], the curve and ladder formulas, and the sponge and ladder
+control flow. It needs Lean 4.34 (through elan) and, for TLC, Java:
+
+```sh
+formal/check.sh          # transcription checks, Lean proofs, TLC
+formal/check.sh lean     # without TLC
+```
+
+`formal/tools/check_transcriptions.py` fails when a source line quoted by a
+hand-written model changes, so edits to the modelled code show up as stale
+proofs.
+
 ## Mutation check
 
 ```sh

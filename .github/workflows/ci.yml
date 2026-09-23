@@ -163,6 +163,20 @@ jobs:
       - name: Install with tests and documentation
         run: opam reinstall curve448 --with-test --with-doc
 
+  formal:
+    runs-on: avrea-ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install elan (formal/lean/lean-toolchain pins Lean)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Transcription checks and Lean proofs
+        run: formal/check.sh lean
+
   hygiene:
     runs-on: avrea-ubuntu-latest
     steps:
@@ -181,6 +195,9 @@ jobs:
       - run: python3 tools/gen_tables.py --ocaml --check lib/ocaml/table448.ml
       - run: python3 tools/gen_fe448_ocaml.py --check lib/ocaml/fe448_kernels.ml
       - run: python3 tools/gen_keccak_ocaml.py --check lib/ocaml/keccak.ml
+      - run: python3 formal/tools/check_transcriptions.py
+      - run: python3 formal/tools/kernels_to_lean.py --check
+      - run: python3 formal/tools/keccak_to_lean.py --check
       - name: No Array.fill or Array.blit in the OCaml backend (see lib/ocaml/fe448.ml)
         run: "! grep -nE 'Array[.](fill|blit)[^]]' lib/ocaml/*.ml"
       - run: git diff --exit-code

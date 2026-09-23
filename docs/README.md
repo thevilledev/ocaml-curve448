@@ -17,6 +17,8 @@
 
 - [Contributing](../CONTRIBUTING.md): setup and everyday checks.
 - [Testing](testing.md): suites, generators and optional checks.
+- [Formal verification](../formal/README.md): Lean 4 proofs and TLA+ models
+  of both implementations.
 - [Design](design.md): arithmetic, implementation choices and trade-offs.
 - [OCaml backend](../lib/ocaml/README.md), [C backend](../lib/c/native/README.md)
   and [native-code inspection](../compiler/README.md).

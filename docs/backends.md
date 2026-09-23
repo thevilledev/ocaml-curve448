@@ -8,7 +8,7 @@ behaviour, and the test suites run against both:
 | | `curve448.ocaml` (default) | `curve448.c` |
 | --- | --- | --- |
 | Written in | OCaml only | C, called through `[@@noalloc]` externals |
-| Field arithmetic | generated kernels whose overflow bounds the generator proves | [fiat-crypto](https://github.com/mit-plv/fiat-crypto), formally verified |
+| Field arithmetic | generated kernels, proved correct and overflow-free in Lean ([formal](../formal/README.md)) | [fiat-crypto](https://github.com/mit-plv/fiat-crypto), formally verified |
 | Third-party code | none | fiat-crypto, and parts adapted from BoringSSL and tiny_sha3 |
 | Needs | 64-bit OCaml | also a 64-bit GCC or Clang |
 | X448, Ed448 sign, Ed448 verify (Apple M1 Pro) | 374, 147, 520 µs | 130, 64, 203 µs |
