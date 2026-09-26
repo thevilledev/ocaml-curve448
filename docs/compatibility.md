@@ -28,15 +28,13 @@ The [workflow](../.github/workflows/ci.yml) defines these checks:
 
 | Check | Versions |
 | --- | --- |
-| Linux build, tests and API docs | OCaml 4.14 and each 5.x series through 5.5 |
-| Older Dune, on OCaml 4.14 | 3.6.2, 3.10.0 and 3.15.3 |
+| Linux build, tests and API docs | OCaml 4.14 and 5.5 |
 | Latest Dune | Resolved by opam in the regular compiler matrix |
 | Exact lower bounds | OCaml 4.14.0, Dune 3.6.2 and all direct dependency minima |
 
-Old Dune releases run on OCaml 4.14 because they do not support every newer
-compiler. This matrix is the CI configuration, not a claim that every listed
-job has already passed on every platform. CI runs only on Linux using
-Avrea-hosted runners; macOS and Windows are not currently in CI.
+This matrix is the CI configuration, not a claim that every listed job has
+already passed on every platform. CI runs only on Linux using Avrea-hosted
+runners; macOS and Windows are not currently in CI.
 
 ## Reproduce the lower-bound test
 
