@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ocaml: ["4.14", "5.0", "5.1", "5.2", "5.3", "5.4", "5.5"]
+        ocaml: ["4.14", "5.4"]
     runs-on: avrea-ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -114,7 +114,7 @@ jobs:
           persist-credentials: false
       - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
         with:
-          ocaml-compiler: "5.5"
+          ocaml-compiler: "5.4"
           dune-cache: true
       - run: opam install . --deps-only --with-test
       - run: opam exec -- dune build --profile fuzz fuzz/fuzz_curve448_ocaml.exe fuzz/fuzz_curve448_c.exe
@@ -133,7 +133,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ocaml: ["4.14", "5.5"]
+        ocaml: ["4.14", "5.4"]
     runs-on: avrea-ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -155,7 +155,7 @@ jobs:
           persist-credentials: false
       - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
         with:
-          ocaml-compiler: "5.5"
+          ocaml-compiler: "5.4"
           dune-cache: true
       - run: opam lint --strict curve448.opam
       - name: Install without test or documentation dependencies
@@ -185,7 +185,7 @@ jobs:
           persist-credentials: false
       - uses: ocaml/setup-ocaml@f92e0606b7ae4873dd1238465ea4bf6f8e40d85c # v3.7.2
         with:
-          ocaml-compiler: "5.5"
+          ocaml-compiler: "5.4"
           dune-cache: true
       - run: opam install . --deps-only --with-test --with-doc
       - run: opam install ocamlformat.0.29.0

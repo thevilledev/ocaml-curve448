@@ -28,7 +28,7 @@ The [workflow](../.github/workflows/ci.yml) defines these checks:
 
 | Check | Versions |
 | --- | --- |
-| Linux build, tests and API docs | OCaml 4.14 and each 5.x series through 5.5 |
+| Linux build, tests and API docs | OCaml 4.14 and 5.4 |
 | Older Dune, on OCaml 4.14 | 3.6.2, 3.10.0 and 3.15.3 |
 | Latest Dune | Resolved by opam in the regular compiler matrix |
 | Exact lower bounds | OCaml 4.14.0, Dune 3.6.2 and all direct dependency minima |
