@@ -1,0 +1,3 @@
+# Keep the Lean proofs, TLA+ models and their tooling out of GitHub's
+# language statistics so the repository is reported as OCaml.
+formal/** linguist-detectable=false
