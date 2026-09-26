@@ -25,7 +25,7 @@ sh compiler/inspect_ocaml_native.sh
 It needs `llvm-objdump` or GNU `objdump`. It passes with OCaml 4.14.4, 5.2.1
 and 5.5.1 on x86-64 Linux, 4.14.1 and 5.4.1 on arm64 Linux (5.4.1 also with
 flambda at -O3) and OCaml 5.4.1 on arm64 macOS; CI runs it with OCaml 4.14 and
-5.4. A failure after a compiler upgrade
+5.5. A failure after a compiler upgrade
 is a request for human inspection of the new disassembly, not proof of a leak.
 Passing establishes only the control-flow shape of the kernels under that
 compiler. The end-to-end check of every secret-dependent path, including the

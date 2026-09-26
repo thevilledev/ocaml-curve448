@@ -103,7 +103,7 @@ This has been checked, not proven:
   runtime (which would mean an allocation). It passes with OCaml 4.14.4, 5.2.1
   and 5.5.1 on x86-64 Linux, 4.14.1 and 5.4.1 (also with flambda at -O3) on
   arm64 Linux, and 5.4.1 on arm64 macOS, and CI runs it with OCaml 4.14 and
-  5.4. The Valgrind harness
+  5.5. The Valgrind harness
   also checks that the kernels do not allocate, which holds for every
   compiler above, including flambda at -O2 and -O3. These check control flow
   and allocation only, and only for those kernels.
